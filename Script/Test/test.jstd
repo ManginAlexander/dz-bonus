@@ -1,0 +1,6 @@
+server: http://localhost:4224
+load:
+  - ../Src/*
+test:
+  - fieldErrorTest.js
+timeout: 90
