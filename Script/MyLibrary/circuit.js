@@ -1,4 +1,4 @@
-(function (toExport) {
+﻿(function (toExport) {
     var Circuit = function(param) {
         toExport.Model.call(this, param);
     };
@@ -10,7 +10,7 @@
         if (typeof this.points === "undefined") {
             result.push(new FieldsError("points","Поле не задано", true));
         }
-    }
+    };
     toExport.Circuit = Circuit;
     Circuit.prototype.Draw = function() {
         var i = 0,

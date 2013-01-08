@@ -1,4 +1,4 @@
-(function (toExport){
+﻿(function (toExport){
     "use strict";
     /**
      * Базовый класс всех моих классов

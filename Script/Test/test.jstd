@@ -1,6 +1,12 @@
-server: http://localhost:4224
+﻿server: http://localhost:4224
 load:
-  - ../Src/*
+  - ../MyLibrary/model.js
+  - ../MyLibrary/point2d.js
+  - ../MyLibrary/line2d.js
+  - ../MyLibrary/playersState.js
+  - ../MyLibrary/managerTrajectory.js
+
 test:
-  - fieldErrorTest.js
+  - managerTrajectoryTest.js
+  - point2dTest.js
 timeout: 90

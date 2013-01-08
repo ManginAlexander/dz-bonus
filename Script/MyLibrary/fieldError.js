@@ -1,4 +1,4 @@
-(function(toExport) {
+﻿(function(toExport) {
     var FieldsError = function (field, message, isCritical) {
         this.field = field;
         this.message = message;

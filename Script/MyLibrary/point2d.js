@@ -1,4 +1,4 @@
-(function (toExport) {
+﻿(function (toExport) {
     /**
      * @class {Point2d} моделируют точку в двумерном пространстве
      * @param container {Object} объект, содержащий координаты x и y
@@ -7,6 +7,15 @@
     var Point2d = function (container) {
         toExport.Model.call(this, container);
     };
+    Point2d.prototype = Object.create(toExport.Model.prototype, {
+        constructor: {
+            value: Point2d,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    toExport.Point2d = Point2d;
     Point2d.prototype.getAllError = function () {
         var resultError = [];
         if (typeof this.x === "number") {
@@ -50,30 +59,29 @@
             Math.abs(this.y - otherPoint.y) < 1);
     };
     /**
-     * @function функция проверяет принадлежит ли точка конкретному сегменту прямой
-     * @param line {Line2d}
+     * @function функция проверяет принадлежит ли точка между двумя точками или нет
+     * @param a {Point2d}
+     * @param b {Point2d}
      * @return {Boolean}
      */
-    Point2d.prototype.onSegmentLine = function (line) {
-        var minX, maxX,minY,maxY;
+    Point2d.prototype.between2Point = function (a, b) {
+        var minX, maxX, minY, maxY;
 
-        if (!line.onLine(this)) {
-            return false;
-        }
-        minX = Math.min(line.start.x, line.finish.x);
-        maxX = Math.max(line.start.x, line.finish.x);
-        minY = Math.min(line.start.y, line.finish.y);
-        maxY = Math.max(line.start.y, line.finish.y);
+        minX = Math.min(a.x, b.x);
+        maxX = Math.max(a.x, b.x);
+        minY = Math.min(a.y, b.y);
+        maxY = Math.max(a.y, b.y);
         return minX <= this.x && this.x <= maxX &&
             minY <= this.y && this.y <= maxY;
     };
-    Point2d.prototype = Object.create(toExport.Model.prototype, {
-        constructor: {
-            value: Event,
-            enumerable: false,
-            writable: true,
-            configurable: true
-        }
-    });
-    toExport.Point2d = Point2d;
+    Point2d.prototype.invert = function() {
+        return new Point2d({
+            "x": -this.x,
+            "y": -this.y
+        })
+    }
+    Point2d.Zero = new Point2d({
+        "x": 0,
+        "y": 0
+    })
 }(window));
