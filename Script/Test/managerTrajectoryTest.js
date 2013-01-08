@@ -51,7 +51,7 @@
                     "start": this.Dots.d,
                     "finish": this.Dots.a
                 })];
-        this.manager = new ManagerTrajectory({"lines":square});
+        this.manager = new ManagerTrajectory({"lines":square, "radiusOfCircle": 10});
     },
     "test while(true) move from center to c then a" : function () {
         var currentState = new PlayerState({
@@ -63,15 +63,17 @@
                 "x": 50,
                 "y": 50
             })
-        });
+        }),
+            angleC = new Point2d({"x":90,"y":90}),
+            angleA = new Point2d({"x":10,"y":10});
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("C1", this.Dots.c.equal(currentState.location));
+        assertTrue("angleC1", angleC.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("A1", this.Dots.a.equal(currentState.location));
+        assertTrue("angleA1", angleA.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("C2", this.Dots.c.equal(currentState.location));
+        assertTrue("angleC2", angleC.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("A2", this.Dots.a.equal(currentState.location));
+        assertTrue("angleA2", angleA.equal(currentState.location));
     },
     "test while(true) move from center to a then c invertion" : function () {
         var currentState = new PlayerState({
@@ -83,15 +85,17 @@
                 "x": -50,
                 "y": -50
             })
-        });
+        }),
+            angleC = new Point2d({"x":90,"y":90}),
+            angleA = new Point2d({"x":10,"y":10});
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("A1", this.Dots.a.equal(currentState.location));
+        assertTrue("A1", angleA.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("C1", this.Dots.c.equal(currentState.location));
+        assertTrue("C1", angleC.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("A2", this.Dots.a.equal(currentState.location));
+        assertTrue("A2", angleA.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("C2", this.Dots.c.equal(currentState.location));
+        assertTrue("C2", angleC.equal(currentState.location));
     },
     "test sdfsdf" : function () {
         this.setUp();
@@ -105,6 +109,7 @@
                 "y": -25
             })
         });
+
         currentState = this.manager.getFutureState(currentState);
         assertTrue("middleDA1", this.Dots.middleDA.equal(currentState.location)); //50 0
         currentState = this.manager.getFutureState(currentState);

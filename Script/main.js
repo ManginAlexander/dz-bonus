@@ -63,15 +63,15 @@
     });
     canvas.add(circle);
     var managerTrajectory = new ManagerTrajectory({
-        "lines": lines});
+        "lines": lines,"radiusOfCircle": 30});
     var state = new PlayerState({
         "location": new Point2d({
-            "x": 500,
-            "y": 500
+            "x": 100,
+            "y": 100
         }),
         "speed": new Point2d({
             "x": 25,
-            "y": 25
+            "y": -25
         })
     });
     var queueMove = [];

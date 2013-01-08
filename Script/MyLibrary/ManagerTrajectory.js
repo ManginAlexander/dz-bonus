@@ -38,15 +38,14 @@
             console.log("Чтото пошло явно не так");
             throw new Error();
         }
-        var cross = moveLine.getCross((nearestCross[0]));
         var newState = new PlayerState({
-            "location": cross
+            "location": nearestCross[0].cross
         });
         if (nearestCross.length != 1) {
             newState.speed = previousState.speed.invert();
         }
         else {
-            var mirrorLine = moveLine.getMirrorReflection(nearestCross[0]),
+            var mirrorLine = moveLine.getMirrorReflection(nearestCross[0].line),
                 speedNonNormalize = new Point2d({
                     "x": mirrorLine.dx(),
                     "y": mirrorLine.dy()
@@ -65,6 +64,7 @@
     ManagerTrajectory.prototype.getRealCrossWith = function(crossLine) {
         var nearestCross = [];
         var minimalDistanceForCross = Number.POSITIVE_INFINITY;
+        var that = this;
         this.lines.forEach(function(line) {
             var cross = crossLine.getCross(line);
             if (cross === null) {
@@ -73,7 +73,15 @@
             if (cross.between2Point(crossLine.start, crossLine.finish) ||
                 crossLine.finish.between2Point(crossLine.start, cross)) {
                 var distance = crossLine.start.distanceTo(cross);
-                if (distance < 1) {
+                var distanceBetweenStartOfCrossLineAndLine =line.getDistanceTo(crossLine.start);
+                var k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
+
+                var realCross = new Point2d({
+                    "x": crossLine.start.x + (cross.x - crossLine.start.x) * ((k-1)/k),
+                    "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k-1)/k)
+                });
+                distance = crossLine.start.distanceTo(realCross);
+                if (distance < that.radiusOfCircle) {
                     return;
                 }
                 if (minimalDistanceForCross >= distance )
@@ -82,7 +90,7 @@
                         nearestCross = [];
                         minimalDistanceForCross = distance
                     }
-                    nearestCross.push(line);
+                    nearestCross.push({"line": line,"cross": realCross});
                 }
             }
         });
