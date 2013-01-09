@@ -81,9 +81,6 @@
                     "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k-1)/k)
                 });
                 distance = crossLine.start.distanceTo(realCross);
-                if (distance < that.radiusOfCircle) {
-                    return;
-                }
                 if (minimalDistanceForCross >= distance )
                 {
                     if (minimalDistanceForCross != distance) {

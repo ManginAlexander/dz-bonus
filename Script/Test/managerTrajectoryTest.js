@@ -76,6 +76,7 @@
         assertTrue("angleA2", angleA.equal(currentState.location));
     },
     "test while(true) move from center to a then c invertion" : function () {
+        this.setUp();
         var currentState = new PlayerState({
             "location": new Point2d({
                 "x": 50,
@@ -88,6 +89,7 @@
         }),
             angleC = new Point2d({"x":90,"y":90}),
             angleA = new Point2d({"x":10,"y":10});
+
         currentState = this.manager.getFutureState(currentState);
         assertTrue("A1", angleA.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
@@ -97,28 +99,33 @@
         currentState = this.manager.getFutureState(currentState);
         assertTrue("C2", angleC.equal(currentState.location));
     },
-    "test sdfsdf" : function () {
+    "test middles of square's line" : function () {
         this.setUp();
         var currentState = new PlayerState({
             "location": new Point2d({
                 "x": 25,
-                "y": 25
+                "y": 35
             }),
             "speed": new Point2d({
                 "x": 25,
                 "y": -25
             })
-        });
+        }),
+            crossWithMiddleDA = new Point2d({"x": 50, "y": 10}),
+            crossWithMiddleCD = new Point2d({"x": 90, "y": 50}),
+            crossWithMiddleBC = new Point2d({"x": 50, "y": 90}),
+            crossWithMiddleAB = new Point2d({"x": 10, "y": 50});
+
 
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("middleDA1", this.Dots.middleDA.equal(currentState.location)); //50 0
+        assertTrue("middleDA1", crossWithMiddleDA.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("middleCD1", this.Dots.middleCD.equal(currentState.location)); //100 50
+        assertTrue("middleCD1", crossWithMiddleCD.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("middleBC1", this.Dots.middleBC.equal(currentState.location)); //50 100
+        assertTrue("middleBC1", crossWithMiddleBC.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("middleAB1", this.Dots.middleAB.equal(currentState.location)); //0 50
+        assertTrue("middleAB1", crossWithMiddleAB.equal(currentState.location));
         currentState = this.manager.getFutureState(currentState);
-        assertTrue("middleDA2", this.Dots.middleDA.equal(currentState.location)); //50 0
+        assertTrue("middleDA2", crossWithMiddleDA.equal(currentState.location));
     }
 });
