@@ -2,8 +2,8 @@
     var selectNameTest = $("#selectTest"),
         nameTest = selectNameTest.val(),
         nameToPath = {
-            "azproduction": "./Example/azproduction.json",
-            "square": "./Example/square.json"
+            "azproduction": "./Script/Example/azproduction.json",
+            "square": "./Script/Example/square.json"
         },
         currentGame,
         canvas;
