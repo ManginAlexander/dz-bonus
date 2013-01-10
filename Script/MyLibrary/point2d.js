@@ -79,7 +79,32 @@
             "x": -this.x,
             "y": -this.y
         })
-    }
+    };
+    Point2d.prototype.subtractWith = function(otherPoint) {
+        return new Point2d({
+            "x": this.x - otherPoint.x,
+            "y": this.y - otherPoint.y
+        });
+    };
+    Point2d.prototype.addWith = function(otherPoint) {
+        return new Point2d({
+            "x": this.x + otherPoint.x,
+            "y": this.y + otherPoint.y
+        });
+    };
+    Point2d.prototype.getNormalizedPoint = function () {
+       var length = this.distanceTo(Point2d.Zero);
+        return new Point2d({
+            "x": this.x /length,
+            "y": this.y /length
+        });
+    };
+    Point2d.prototype.multiply = function (number) {
+        return new Point2d({
+           "x": this.x * number,
+           "y": this.y * number
+        });
+    };
     Point2d.Zero = new Point2d({
         "x": 0,
         "y": 0

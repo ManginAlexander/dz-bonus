@@ -73,7 +73,7 @@
     };
     Line2d.prototype.getDistanceTo = function (point) {
         return Math.abs((this.a*point.x +this.b*point.y +this.c)/(Math.sqrt(this.a * this.a + this.b * this.b)));
-    }
+    };
     Line2d.prototype.getNormalLine = function (point) {
         var c = this.a * point.y - this.b * point.x;
         return getFakeLine(this.b, -this.a, c);
@@ -92,6 +92,11 @@
                 "x": finishX,
                 "y": finishY})
         });
+    };
+    Line2d.prototype.getAbsAngle = function() {
+        var toZero = this.finish.subtractWith(this.start);
+        return 360 * (Math.atan2(toZero.y, toZero.x) - Math.PI/2) / (2 * Math.PI);
+
     };
     var getFakeLine = function(a,b,c) {
         var line = new Line2d({

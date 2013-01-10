@@ -43,7 +43,12 @@
         ],
         state = new PlayerState({
             "location": new Point2d({"x":100, "y":100}),
-            "speed": new Point2d({"x":25, "y":35})
+            "speed": new Point2d({"x":5, "y":5})
         });
-    new Game({"lines": lines, "state": state}).start();
+    new Game({
+        "lines": lines,
+        "state": state,
+        "distanceBetweenCircleAndSmallAngle": 20,
+        "widthLine": 30
+    }).start();
 }());
