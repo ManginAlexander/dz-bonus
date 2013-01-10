@@ -80,6 +80,10 @@
                     "x": crossLine.start.x + (cross.x - crossLine.start.x) * ((k-1)/k),
                     "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k-1)/k)
                 });
+                var projectionRealCross =line.getNormalLine(realCross).getCross(line);
+                if (!projectionRealCross.between2Point(line.start, line.finish)) {
+                    return;
+                }
                 distance = crossLine.start.distanceTo(realCross);
                 if (minimalDistanceForCross >= distance )
                 {
@@ -91,6 +95,6 @@
                 }
             }
         });
-        return nearestCross;
+        return nearestCross
     };
 }(window));

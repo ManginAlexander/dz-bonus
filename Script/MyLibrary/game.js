@@ -3,14 +3,7 @@
     var Game = function (container) {
         var that = this;
         toExport.Model.call(this, container);
-        var el = $("<canvas />", {
-            "id":"c"
-        })
-            .attr("width", document.body.offsetWidth)
-            .attr("height", window.innerHeight)
-            .attr("style","border:1px solid #ccc")
-            .appendTo(document.body);
-        this.canvas = new fabric.Canvas("c");
+
         this.lines.forEach(function(line) {
             var angle = line.getAbsAngle();
             var middle = line.start.addWith(line.finish).multiply(1/2);
@@ -26,7 +19,7 @@
         this.circle = new fabric.Circle({
             "left": this.state.location.x,
             "top": this.state.location.y,
-            "radius": 60
+            "radius": this.radius
         });
         this.circle.setGradientFill({
             x1: 0,
@@ -44,11 +37,15 @@
         this.canvas.add(this.circle);
         this.manager = new ManagerTrajectory({
             "lines": this.lines,
-            "radiusOfCircle": this.circle.radius + this.widthLine
+            "radiusOfCircle": this.circle.radius + this.widthLine/2
         });
         this.queueMove = [];
-        this.checkPointsContainer = new CheckPointContainer({"canvas": this.canvas});
+        this.checkPointsContainer = new CheckPointContainer({
+            "canvas": this.canvas,
+            "radius": this.radius,
+        });
         this.isChangeMoveVector= false;
+        this.isAnimate= true;
     };
 
     Game.prototype = Object.create(toExport.Model.prototype, {
@@ -69,12 +66,10 @@
 
         this.canvas.on('mouse:down', function(e) {
             if(e.target == that.circle) {
-                that.isAnimate = false;
                 that.isChangeMoveVector = true;
             }
         });
         this.canvas.on('mouse:up', function(e) {
-            that.isAnimate = true;
             that.isChangeMoveVector = false;
             if (arrow) {
                 that.canvas.remove(arrow);
@@ -110,9 +105,8 @@
                     .set("top", that.state.location.y + k * vector.y)
                     .set("angle", angle)
                     .setBodyHeight(distance/2);
-                console.log("Height: " + arrow.height);
                 that.canvas.renderAll();
-                that.changeMoveVector(vector.multiply(-Math.log(1 + distance)));
+                that.changeMoveVector(vector.multiply(-Math.sqrt(distance)));
             }
         });
         this.animateAll();
@@ -124,6 +118,9 @@
             pointOnCircle,
             k,
             normVector;
+        if (!this.isAnimate) {
+            return;
+        }
         setTimeout(function animate() {
             if (!that.isChangeMoveVector) {
                 if (that.queueMove.length == 0) {
@@ -150,12 +147,21 @@
                         that.state.speed = nextState.speed;
                     }
             }
-            setTimeout(animate, frequencyUpdate);
+
+            if (that.isAnimate) {
+                setTimeout(animate, frequencyUpdate);
+            }
         }, frequencyUpdate);
     };
     Game.prototype.changeMoveVector = function(newSpeed) {
         this.state.speed = newSpeed;
         this.queueMove = [];
         this.checkPointsContainer.clear();
+    };
+    Game.prototype.stop = function (onStop) {
+
+        this.isChangeMoveVector = false;
+        this.isAnimate = false;
+        this.canvas.clear();
     }
 }(window));

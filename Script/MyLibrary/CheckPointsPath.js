@@ -3,10 +3,9 @@
     var CheckPointContainer = function (container) {
         this.graphicCheckPoints = [];
         this.checkPoints = [];
-
-        this.radius = 10;
-        this.distanceBetweenCheckPoint = this.radius*2 ;
         toExport.Model.call(this, container);
+        this.radius = this.radius /3;
+        this.distanceBetweenCheckPoint = this.radius*4 ;
     };
     toExport.CheckPointContainer = CheckPointContainer;
     CheckPointContainer.prototype.clear = function () {
