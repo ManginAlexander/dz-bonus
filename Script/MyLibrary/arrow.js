@@ -1,9 +1,18 @@
-(function(toExport) {
+/*global
+ fabric: false,
+ */
+(function (toExport) {
+    "use strict";
+    /**
+     *
+     * @class {Arrow} реализует стрелочки ->
+     * @externs {fabric.Object}
+     */
     toExport.fabric.Arrow = fabric.util.createClass(fabric.Object, {
 
         type: 'arrow',
 
-        initialize:function (options) {
+        initialize: function (options) {
             this.callSuper('initialize', options);
             this.arrowHeight = options.arrowHeight || 20;
             this.arrowWidth = options.arrowWidth || 30;
@@ -18,7 +27,7 @@
             return this;
         },
 
-        _render:function (ctx) {
+        _render: function (ctx) {
             var heightBy2 = (this.arrowHeight + this.bodyHeidht) / 2,
                 arrowWidthBy2 = this.arrowHeight / 2,
                 bodyWidthBy2 = this.bodyWidth / 2;

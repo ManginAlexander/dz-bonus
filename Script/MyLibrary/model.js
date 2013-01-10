@@ -1,4 +1,4 @@
-﻿(function (toExport){
+﻿(function (toExport) {
     "use strict";
     /**
      * Базовый класс всех моих классов
@@ -7,8 +7,8 @@
      */
     var Model = function (data) {
         var key;
-        for(key in data) {
-            if(data.hasOwnProperty(key)) {
+        for (key in data) {
+            if (data.hasOwnProperty(key)) {
                 this[key] = data[key];
             }
         }

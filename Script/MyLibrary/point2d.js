@@ -1,4 +1,8 @@
-﻿(function (toExport) {
+﻿/*global
+FieldsError:false
+ */
+(function (toExport) {
+    "use strict";
     /**
      * @class {Point2d} моделируют точку в двумерном пространстве
      * @param container {Object} объект, содержащий координаты x и y
@@ -16,6 +20,9 @@
         }
     });
     toExport.Point2d = Point2d;
+    /**
+     * @function возвращает все ошибки
+     */
     Point2d.prototype.getAllError = function () {
         var resultError = [];
         if (typeof this.x === "number") {
@@ -47,7 +54,7 @@
      * @return {Number}
      */
     Point2d.prototype.distanceTo = function (otherPoint) {
-        return Math.sqrt(Math.pow(this.dx(otherPoint), 2)+Math.pow(this.dy(otherPoint), 2));
+        return Math.sqrt(Math.pow(this.dx(otherPoint), 2) + Math.pow(this.dy(otherPoint), 2));
     };
     /**
      * @function сравнивает две точки
@@ -74,39 +81,59 @@
         return minX <= this.x && this.x <= maxX &&
             minY <= this.y && this.y <= maxY;
     };
-    Point2d.prototype.invert = function() {
-        return new Point2d({
-            "x": -this.x,
-            "y": -this.y
-        })
+    /**
+     * @function Разворот вектора
+     * @return {Point2d}
+     */
+    Point2d.prototype.invert = function () {
+        return this.multiply(-1);
     };
-    Point2d.prototype.subtractWith = function(otherPoint) {
+    /**
+     * @function вычитание двух векторов
+     * @param otherPoint {Point2d}
+     * @return {Point2d}
+     */
+    Point2d.prototype.subtractWith = function (otherPoint) {
         return new Point2d({
             "x": this.x - otherPoint.x,
             "y": this.y - otherPoint.y
         });
     };
-    Point2d.prototype.addWith = function(otherPoint) {
+    /**
+     * @function сложение двух векторов
+     * @param otherPoint {Point2d}
+     * @return {Point2d}
+     */
+    Point2d.prototype.addWith = function (otherPoint) {
         return new Point2d({
             "x": this.x + otherPoint.x,
             "y": this.y + otherPoint.y
         });
     };
+    /**
+     * Нормализация вектора
+     * @return {Point2d}
+     */
     Point2d.prototype.getNormalizedPoint = function () {
-       var length = this.distanceTo(Point2d.Zero);
-        return new Point2d({
-            "x": this.x /length,
-            "y": this.y /length
-        });
+        return this.multiply(1 / this.distanceTo(Point2d.Zero));
     };
+    /**
+     * Умножение вектора на число
+     * @param number {Number}
+     * @return {Point2d}
+     */
     Point2d.prototype.multiply = function (number) {
         return new Point2d({
-           "x": this.x * number,
-           "y": this.y * number
+            "x": this.x * number,
+            "y": this.y * number
         });
     };
+    /**
+     * @static Ноль
+     * @type {Point2d}
+     */
     Point2d.Zero = new Point2d({
         "x": 0,
         "y": 0
-    })
+    });
 }(window));

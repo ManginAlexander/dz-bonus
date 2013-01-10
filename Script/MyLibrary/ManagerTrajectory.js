@@ -1,6 +1,11 @@
-(function(toExport){
+/*global
+ Point2d: false,
+ Line2d: false,
+ PlayerState:false
+ */
+(function (toExport) {
     "use strict";
-    var ManagerTrajectory = function(container) {
+    var ManagerTrajectory = function (container) {
         toExport.Model.call(this, container);
     };
 
@@ -14,13 +19,12 @@
     });
     toExport.ManagerTrajectory = ManagerTrajectory;
     /**
-     *
+     * @function найти состояния фишки сразу после столкновения
      * @param {PlayerState} previousState
-     * @return {*}
+     * @return {PlayerState}
      */
-    ManagerTrajectory.prototype.getFutureState = function(previousState) {
-        if (previousState.speed.distanceTo(Point2d.Zero) < 1)
-        {
+    ManagerTrajectory.prototype.getFutureState = function (previousState) {
+        if (previousState.speed.distanceTo(Point2d.Zero) < 1) {
             return previousState;
         }
         var moveLine = new Line2d({
@@ -32,26 +36,30 @@
                 "x": previousState.location.x + previousState.speed.x,
                 "y": previousState.location.y + previousState.speed.y
             })
-        });
-        var nearestCross = this.getRealCrossWith(moveLine);
-        if (nearestCross.length == 0) {
+        }),
+            nearestCross = this.getRealCrossWith(moveLine),
+            newState,
+            mirrorLine,
+            speedNonNormalize,
+            valueSpeedNonNormalize,
+            valueSpeed;
+        if (nearestCross.length === 0) {
             console.log("Чтото пошло явно не так");
             throw new Error();
         }
-        var newState = new PlayerState({
+        newState = new PlayerState({
             "location": nearestCross[0].cross
         });
-        if (nearestCross.length != 1) {
+        if (nearestCross.length !== 1) {
             newState.speed = previousState.speed.invert();
-        }
-        else {
-            var mirrorLine = moveLine.getMirrorReflection(nearestCross[0].line),
-                speedNonNormalize = new Point2d({
-                    "x": mirrorLine.dx(),
-                    "y": mirrorLine.dy()
-                }),
-                valueSpeedNonNormalize = speedNonNormalize.distanceTo(Point2d.Zero),
-                valueSpeed = previousState.speed.distanceTo(Point2d.Zero);
+        } else {
+            mirrorLine = moveLine.getMirrorReflection(nearestCross[0].line);
+            speedNonNormalize = new Point2d({
+                "x": mirrorLine.dx(),
+                "y": mirrorLine.dy()
+            });
+            valueSpeedNonNormalize = speedNonNormalize.distanceTo(Point2d.Zero);
+            valueSpeed = previousState.speed.distanceTo(Point2d.Zero);
             speedNonNormalize.x = (speedNonNormalize.x / valueSpeedNonNormalize) * valueSpeed;
             speedNonNormalize.y = (speedNonNormalize.y / valueSpeedNonNormalize) * valueSpeed;
             newState.speed = speedNonNormalize;
@@ -59,42 +67,50 @@
         return newState;
     };
     /**
-     * crossLine {Line2d}
+     * Найти реальное место столкновения с учетом размера стенок и размера шара
+     * @field crossLine {Line2d}
+     * @return {Object}
      */
-    ManagerTrajectory.prototype.getRealCrossWith = function(crossLine) {
-        var nearestCross = [];
-        var minimalDistanceForCross = Number.POSITIVE_INFINITY;
-        var that = this;
-        this.lines.forEach(function(line) {
+    ManagerTrajectory.prototype.getRealCrossWith = function (crossLine) {
+        var nearestCross = [],
+            minimalDistanceForCross = Number.POSITIVE_INFINITY,
+            that = this,
+            distance,
+            distanceBetweenStartOfCrossLineAndLine,
+            k,
+            realCross,
+            projectionRealCross;
+        this.lines.forEach(function (line) {
             var cross = crossLine.getCross(line);
             if (cross === null) {
                 return;
             }
             if (cross.between2Point(crossLine.start, crossLine.finish) ||
-                crossLine.finish.between2Point(crossLine.start, cross)) {
-                var distance = crossLine.start.distanceTo(cross);
-                var distanceBetweenStartOfCrossLineAndLine =line.getDistanceTo(crossLine.start);
-                var k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
+                    crossLine.finish.between2Point(crossLine.start, cross)) {
+                distanceBetweenStartOfCrossLineAndLine = line.getDistanceTo(crossLine.start);
+                k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
 
-                var realCross = new Point2d({
-                    "x": crossLine.start.x + (cross.x - crossLine.start.x) * ((k-1)/k),
-                    "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k-1)/k)
+                realCross = new Point2d({
+                    "x": crossLine.start.x + (cross.x - crossLine.start.x) * ((k - 1) / k),
+                    "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k - 1) / k)
                 });
-                var projectionRealCross =line.getNormalLine(realCross).getCross(line);
+                projectionRealCross = line.getNormalLine(realCross).getCross(line);
                 if (!projectionRealCross.between2Point(line.start, line.finish)) {
                     return;
                 }
                 distance = crossLine.start.distanceTo(realCross);
-                if (minimalDistanceForCross >= distance )
-                {
-                    if (minimalDistanceForCross != distance) {
+                if (minimalDistanceForCross >= distance) {
+                    if (minimalDistanceForCross !== distance) {
                         nearestCross = [];
-                        minimalDistanceForCross = distance
+                        minimalDistanceForCross = distance;
                     }
-                    nearestCross.push({"line": line,"cross": realCross});
+                    nearestCross.push({
+                        "line": line,
+                        "cross": realCross
+                    });
                 }
             }
         });
-        return nearestCross
+        return nearestCross;
     };
 }(window));
