@@ -19,25 +19,23 @@
      * @constructor
      */
     var Game = function (container) {
-        var that = this;
-        toExport.Model.call(this, container);
+        var that = this,
+            points = [];
 
+        toExport.Model.call(this, container);
         this.lines.forEach(function (line) {
-            var angle = line.getAbsAngle(),
-                middle = line.start.addWith(line.finish).multiply(0.5),
-                lineGr = new fabric.Rect({
-                    "left": middle.x,
-                    "top": middle.y,
-                    "width": that.widthLine,
-                    "height": line.start.distanceTo(line.finish),
-                    "angle": angle,
-                    "hasControls": false,
-                    "hasBorders": false,
-                    "lockMovementX": true,
-                    "lockMovementY": true
-                });
-            that.canvas.add(lineGr);
+            points.push(line.start);
         });
+        points.push(this.lines[0].start);
+        this.canvas.add(new fabric.Polyline(points, {
+            "stroke": 'rgba(81,81,81,1)',
+            "fill": 'rgba(33,127,213,0)',
+            "strokeWidth": that.widthLine,
+            "hasControls": false,
+            "hasBorders": false,
+            "lockMovementX": true,
+            "lockMovementY": true
+        }));
 
         this.circle = new fabric.Circle({
             "left": this.state.location.x,
@@ -161,12 +159,6 @@
                 if (that.queueMove.length === 0) {
                     console.log("Текущее состояние шарика");
                     console.log(that.state.toString());
-                    that.canvas.add(new fabric.Line([
-                        that.state.location.x,
-                        that.state.location.y,
-                        that.state.location.x + that.state.speed.x,
-                        that.state.location.y + that.state.speed.y
-                    ]));that.canvas.renderAll();
                     nextState = that.manager.getFutureState(that.state);
                     console.log(nextState.toString());
                     that.queueMove = that.state.getDiffs(nextState);

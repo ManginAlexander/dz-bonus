@@ -78,8 +78,10 @@
             distance,
             distanceBetweenStartOfCrossLineAndLine,
             k,
+            additionalPoint,
             realCross,
-            projectionRealCross;
+            projectionRealCross,
+            angle;
         this.lines.forEach(function (line) {
             var cross = crossLine.getCross(line);
             if (cross === null) {
@@ -87,7 +89,7 @@
             }
             if (cross.subtractWith(crossLine.start).isCollinear(crossLine.getVector())) {
                 distanceBetweenStartOfCrossLineAndLine = line.getDistanceTo(crossLine.start);
-                if (distanceBetweenStartOfCrossLineAndLine <=that.radiusOfCircle) {
+                if (distanceBetweenStartOfCrossLineAndLine <= that.radiusOfCircle) {
                     return;
                 }
                 k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
@@ -99,12 +101,12 @@
                 projectionRealCross = line.getNormalLine(realCross).getCross(line);
                 if (!projectionRealCross.between2Point(line.start, line.finish)) {
                     //возможно мы врезались в угол
-                    var angle = crossLine.getDistanceTo(line.start) < crossLine.getDistanceTo(line.finish)
+                    angle = crossLine.getDistanceTo(line.start) < crossLine.getDistanceTo(line.finish)
                         ? line.start : line.finish;
                     if (crossLine.getDistanceTo(angle) > that.radiusOfCircle) {
                         return; //нет мы не врезались в угол
                     }
-                    var additionalPoint = crossLine.getNormalLine(angle).getCross(crossLine);
+                    additionalPoint = crossLine.getNormalLine(angle).getCross(crossLine);
                     k = additionalPoint.distanceTo(crossLine.start) - Math.sqrt(that.radiusOfCircle * that.radiusOfCircle - additionalPoint.distanceTo(angle) * additionalPoint.distanceTo(angle));
 
                     realCross = crossLine.getVector().getNormalizedVector().multiply(k).addWith(crossLine.start);

@@ -50,7 +50,11 @@
             "radius": this.radius,
             "left": point.x,
             "top": point.y,
-            "fill": "red"
+            "fill": "red",
+            "hasControls": false,
+            "hasBorders": false,
+            "lockMovementX": true,
+            "lockMovementY": true
         });
         this.canvas.add(circle);
         this.graphicCheckPoints.push(circle);

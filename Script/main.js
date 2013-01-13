@@ -36,7 +36,7 @@
                     "y": parseInt(point.y)
                 }));
             });
-            for(var i = 0; i < points.length - 1;i += 1) {
+            for (var i = 0; i < points.length - 1;i += 1) {
                 lines.push(new Line2d({"start": points[i],"finish": points[i+1]}));
             }
             lines.push(new Line2d({"start": points[points.length - 1],"finish": points[0]}));
@@ -47,7 +47,7 @@
                 "lines": lines,
                 "state": state,
                 "canvas": canvas,
-                "radius": 10,
+                "radius": 20,
                 "widthLine": 30,
                 "distanceBetweenCircleAndSmallAngle": 30
             });
@@ -61,7 +61,5 @@
     });
     if (nameToPath[nameTest])
         startGame(nameToPath[nameTest]);
-
-//    var currentGame =
 
 }());
