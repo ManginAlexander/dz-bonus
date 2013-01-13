@@ -24,14 +24,19 @@
 
         this.lines.forEach(function (line) {
             var angle = line.getAbsAngle(),
-                middle = line.start.addWith(line.finish).multiply(0.5);
-            that.canvas.add(new fabric.Rect({
-                "left": middle.x,
-                "top": middle.y,
-                "width": that.widthLine,
-                "height": line.start.distanceTo(line.finish),
-                "angle": angle
-            }));
+                middle = line.start.addWith(line.finish).multiply(0.5),
+                lineGr = new fabric.Rect({
+                    "left": middle.x,
+                    "top": middle.y,
+                    "width": that.widthLine,
+                    "height": line.start.distanceTo(line.finish),
+                    "angle": angle,
+                    "hasControls": false,
+                    "hasBorders": false,
+                    "lockMovementX": true,
+                    "lockMovementY": true
+                });
+            that.canvas.add(lineGr);
         });
 
         this.circle = new fabric.Circle({
@@ -111,7 +116,7 @@
                 arrow = null;
             }
             if (distance >= 0) {
-                vector = mousePoint.subtractWith(that.state.location).getNormalizedPoint();
+                vector = mousePoint.subtractWith(that.state.location).getNormalizedVector();
                 k = (that.circle.radius + that.distanceBetweenCircleAndSmallAngle + (heightArrow) / 2 + distance / 4);
                 angle = new Line2d({
                     "finish": mousePoint,
@@ -154,10 +159,19 @@
         setTimeout(function animate() {
             if (!that.isChangeMoveVector) {
                 if (that.queueMove.length === 0) {
+                    console.log("Текущее состояние шарика");
+                    console.log(that.state.toString());
+                    that.canvas.add(new fabric.Line([
+                        that.state.location.x,
+                        that.state.location.y,
+                        that.state.location.x + that.state.speed.x,
+                        that.state.location.y + that.state.speed.y
+                    ]));that.canvas.renderAll();
                     nextState = that.manager.getFutureState(that.state);
+                    console.log(nextState.toString());
                     that.queueMove = that.state.getDiffs(nextState);
                     k = that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint;
-                    normVector = nextState.location.subtractWith(that.state.location).getNormalizedPoint();
+                    normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();
                     pointOnCircle = that.state.location.addWith(normVector.multiply(k));
                     that.checkPointsContainer.clear();
                     if (pointOnCircle.distanceTo(nextState.location) >= that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint) {
@@ -165,7 +179,7 @@
                     }
                 }
                 that.state.location = that.queueMove.shift();
-                normVector = nextState.location.subtractWith(that.state.location).getNormalizedPoint();
+                normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();
                 pointOnCircle = that.state.location.addWith(normVector.multiply(k));
                 that.checkPointsContainer.removeLessOrEqualThan(pointOnCircle);
                 that.circle.animate('left', that.state.location.x, {

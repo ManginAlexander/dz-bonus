@@ -113,6 +113,12 @@
             "y": y
         });
     };
+    Line2d.prototype.getVector = function () {
+        return new Point2d({
+            "x": this.b,
+            "y": -this.a
+        });
+    };
     /**
      * @function находит расстояние между точкой и прямой
      * @param point {Point2d}

@@ -114,7 +114,7 @@ FieldsError:false
      * Нормализация вектора
      * @return {Point2d}
      */
-    Point2d.prototype.getNormalizedPoint = function () {
+    Point2d.prototype.getNormalizedVector = function () {
         return this.multiply(1 / this.distanceTo(Point2d.Zero));
     };
     /**
@@ -129,6 +129,29 @@ FieldsError:false
         });
     };
     /**
+     * Векторы коллинеарны
+     * @param otherVector {Point2d}
+     * @return {Boolean}
+     */
+    Point2d.prototype.isCollinearity = function (otherVector) {
+        return Math.abs(this.x * otherVector.y - this.y * otherVector.x) < 0.01;
+    };
+    /**
+     * Векторы коллинеарны и соноправленны
+     * @param otherVector {Point2d}
+     * @return {Boolean}
+     */
+    Point2d.prototype.isCollinear = function (otherVector) {
+        if (!this.isCollinearity(otherVector)) {
+            return false;
+        }
+        var mineXPos = this.x > 0,
+            mineYPos = this.y > 0,
+            otherXPos = otherVector.x > 0,
+            otherYPos = otherVector.y > 0;
+        return mineXPos === otherXPos && mineYPos === otherYPos;
+    };
+    /**
      * @static Ноль
      * @type {Point2d}
      */
@@ -136,4 +159,8 @@ FieldsError:false
         "x": 0,
         "y": 0
     });
+    Point2d.prototype.toString = function () {
+        return "(" + this.x + ", " + this.y + ")";
+    };
+
 }(window));

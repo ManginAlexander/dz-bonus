@@ -57,6 +57,7 @@ Point2d: false
     PlayerState.prototype.equal = function (otherState) {
         return Math.abs(this.location.distanceTo(otherState.location) + this.speed.distanceTo(otherState.speed)) < 1;
     };
-
-
+    PlayerState.prototype.toString = function () {
+        return "Loc:" + this.location + ";Speed:" + this.speed;
+    };
 }(window));

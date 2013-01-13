@@ -85,9 +85,11 @@
             if (cross === null) {
                 return;
             }
-            if (cross.between2Point(crossLine.start, crossLine.finish) ||
-                    crossLine.finish.between2Point(crossLine.start, cross)) {
+            if (cross.subtractWith(crossLine.start).isCollinear(crossLine.getVector())) {
                 distanceBetweenStartOfCrossLineAndLine = line.getDistanceTo(crossLine.start);
+                if (distanceBetweenStartOfCrossLineAndLine <=that.radiusOfCircle) {
+                    return;
+                }
                 k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
 
                 realCross = new Point2d({
@@ -96,7 +98,16 @@
                 });
                 projectionRealCross = line.getNormalLine(realCross).getCross(line);
                 if (!projectionRealCross.between2Point(line.start, line.finish)) {
-                    return;
+                    //возможно мы врезались в угол
+                    var angle = crossLine.getDistanceTo(line.start) < crossLine.getDistanceTo(line.finish)
+                        ? line.start : line.finish;
+                    if (crossLine.getDistanceTo(angle) > that.radiusOfCircle) {
+                        return; //нет мы не врезались в угол
+                    }
+                    var additionalPoint = crossLine.getNormalLine(angle).getCross(crossLine);
+                    k = additionalPoint.distanceTo(crossLine.start) - Math.sqrt(that.radiusOfCircle * that.radiusOfCircle - additionalPoint.distanceTo(angle) * additionalPoint.distanceTo(angle));
+
+                    realCross = crossLine.getVector().getNormalizedVector().multiply(k).addWith(crossLine.start);
                 }
                 distance = crossLine.start.distanceTo(realCross);
                 if (minimalDistanceForCross >= distance) {
