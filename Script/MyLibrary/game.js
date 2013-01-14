@@ -68,6 +68,7 @@
         });
         this.isChangeMoveVector = false;
         this.isAnimate = true;
+        this.last = new Point2d({"x": 0, "y": 0});
     };
 
     Game.prototype = Object.create(toExport.Model.prototype, {
@@ -83,9 +84,9 @@
      * @function запускает игру
      */
     Game.prototype.start = function () {
+        console.debug();
         var that = this,
-            arrow = null,
-            heightArrow = 30;
+            arrow = null;
 
         this.canvas.on('mouse:down', function (e) {
             if (e.target === that.circle) {
@@ -100,44 +101,20 @@
             }
         });
         this.canvas.on('mouse:move', function (e) {
-            if (!that.isChangeMoveVector) {
-                return;
+            var currentMouseLocation = new Point2d({"x": e.e.offsetX, "y": e.e.offsetY}),
+                line = new Line2d({
+                    "start": currentMouseLocation,
+                    "finish": that.last
+                }),
+                projectionCenterCircle = line.getNormalLine(that.state.location).getCross(line);
+            if (projectionCenterCircle !== null && projectionCenterCircle.between2Point(currentMouseLocation, that.last) &&  projectionCenterCircle.distanceTo(that.state.location) <= that.circle.radius) {
+
+                that.changeMoveVector(new Point2d({
+                    "x": currentMouseLocation.x - that.last.x,
+                    "y": currentMouseLocation.y - that.last.y
+                }));
             }
-            var mousePoint = new Point2d({"x": e.e.x, "y": e.e.y}),
-                distance = that.state.location.distanceTo(mousePoint) - that.circle.radius - that.distanceBetweenCircleAndSmallAngle,
-                k,
-                vector,
-                angle;
-            console.log(distance);
-            if (distance < 0) {
-                that.canvas.remove(arrow);
-                arrow = null;
-            }
-            if (distance >= 0) {
-                vector = mousePoint.subtractWith(that.state.location).getNormalizedVector();
-                k = (that.circle.radius + that.distanceBetweenCircleAndSmallAngle + (heightArrow) / 2 + distance / 4);
-                angle = new Line2d({
-                    "finish": mousePoint,
-                    "start": that.state.location
-                })
-                    .getAbsAngle();
-                if (arrow === null) {
-                    arrow = new fabric.Arrow({
-                        "arrowHeight": heightArrow,
-                        "arrowWidth": that.circle.radius,
-                        "bodyWidth": that.circle.radius / 3,
-                        fill: 'rgba(206,102,95,1)'
-                    });
-                    arrow.set({ strokeWidth: 1, stroke: 'rgba(165,87,83,1)' });
-                    that.canvas.add(arrow);
-                }
-                arrow.set("left", that.state.location.x + k * vector.x)
-                    .set("top", that.state.location.y + k * vector.y)
-                    .set("angle", angle)
-                    .setBodyHeight(distance / 2);
-                that.canvas.renderAll();
-                that.changeMoveVector(vector.multiply(-Math.sqrt(distance)));
-            }
+            that.last = currentMouseLocation;
         });
         this.animateAll();
     };
@@ -156,11 +133,12 @@
         }
         setTimeout(function animate() {
             if (!that.isChangeMoveVector) {
+                if (that.state.speed.equal(Point2d.Zero)) {
+                    setTimeout(animate, frequencyUpdate);
+                    return;
+                }
                 if (that.queueMove.length === 0) {
-                    console.log("Текущее состояние шарика");
-                    console.log(that.state.toString());
                     nextState = that.manager.getFutureState(that.state);
-                    console.log(nextState.toString());
                     that.queueMove = that.state.getDiffs(nextState);
                     k = that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint;
                     normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();

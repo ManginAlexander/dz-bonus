@@ -45,6 +45,7 @@
             valueSpeed;
         if (nearestCross.length === 0) {
             console.log("Чтото пошло явно не так");
+            this.getRealCrossWith(moveLine)
             throw new Error();
         }
         newState = new PlayerState({
@@ -89,7 +90,7 @@
             }
             if (cross.subtractWith(crossLine.start).isCollinear(crossLine.getVector())) {
                 distanceBetweenStartOfCrossLineAndLine = line.getDistanceTo(crossLine.start);
-                if (distanceBetweenStartOfCrossLineAndLine <= that.radiusOfCircle) {
+                if (distanceBetweenStartOfCrossLineAndLine < that.radiusOfCircle) {
                     return;
                 }
                 k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;

@@ -149,6 +149,12 @@ FieldsError:false
             mineYPos = this.y > 0,
             otherXPos = otherVector.x > 0,
             otherYPos = otherVector.y > 0;
+        if (Math.abs(this.x - otherVector.x) < 0.01) {
+            mineXPos = otherXPos = true;
+        }
+        if (Math.abs(this.y - otherVector.y) < 0.01) {
+            mineYPos = otherYPos = true;
+        }
         return mineXPos === otherXPos && mineYPos === otherYPos;
     };
     /**
