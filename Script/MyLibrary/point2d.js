@@ -49,11 +49,18 @@ FieldsError:false
         return otherPoint.y - this.y;
     };
     /**
+     * @function вычислить длину вектора
+     * @return {Number}
+     */
+    Point2d.prototype.getVectorLength = function () {
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+    };
+    /**
      * @function вычислает евклидово расстояние между двух точек
      * @param otherPoint {Point2d}
      * @return {Number}
      */
-    Point2d.prototype.distanceTo = function (otherPoint) {
+    Point2d.prototype.getDistanceTo = function (otherPoint) {
         return Math.sqrt(Math.pow(this.dx(otherPoint), 2) + Math.pow(this.dy(otherPoint), 2));
     };
     /**
@@ -115,7 +122,7 @@ FieldsError:false
      * @return {Point2d}
      */
     Point2d.prototype.getNormalizedVector = function () {
-        return this.multiply(1 / this.distanceTo(Point2d.Zero));
+        return this.multiply(1 / this.getDistanceTo(Point2d.Zero));
     };
     /**
      * Умножение вектора на число
@@ -165,6 +172,16 @@ FieldsError:false
         "x": 0,
         "y": 0
     });
+    /**
+     * @function дублировать текущую точку.
+     * @return {Point2d}
+     */
+    Point2d.prototype.copy = function () {
+        return new Point2d({
+            "x": this.x,
+            "y": this.y
+        });
+    };
     Point2d.prototype.toString = function () {
         return "(" + this.x + ", " + this.y + ")";
     };

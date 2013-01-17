@@ -12,6 +12,8 @@ Point2d: false
      */
     var PlayerState = function (container) {
         toExport.Model.call(this, container);
+        this.speed = container.speed || Point2d.Zero.copy();
+        this.location = container.location || Point2d.Zero.copy();
     };
     PlayerState.prototype =  Object.create(toExport.Point2d.prototype, {
         constructor: {
@@ -55,7 +57,21 @@ Point2d: false
      * @return {Boolean}
      */
     PlayerState.prototype.equal = function (otherState) {
-        return Math.abs(this.location.distanceTo(otherState.location) + this.speed.distanceTo(otherState.speed)) < 1;
+        return Math.abs(this.location.getDistanceTo(otherState.location) + this.speed.getDistanceTo(otherState.speed)) < 1;
+    };
+    /**
+     * Находится ли фишка в состоянии покоя
+     * @return {Boolean}
+     */
+    PlayerState.prototype.isStay = function () {
+        return Math.abs(this.speed.getVectorLength()) < 1;
+    };
+    /**
+     * @function посчитать следующее положение фишки
+     * @return {Point2d}
+     */
+    PlayerState.prototype.getNextLocation = function () {
+        return this.location.addWith(this.speed);
     };
     PlayerState.prototype.toString = function () {
         return "Loc:" + this.location + ";Speed:" + this.speed;

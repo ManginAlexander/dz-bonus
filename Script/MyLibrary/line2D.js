@@ -87,12 +87,36 @@
         return this.start.dy(this.finish);
     };
     /**
+     * @function подставить точку в функцию прямой
+     * @param point {Point2d}
+     */
+    Line2d.prototype.apply = function (point) {
+        return point.x * this.a + point.y * this.b + this.c;
+    };
+    /**
+     * @function вычисляет коэффицент парраллейности двух прямых, если коэффицент близок к 0, то линии парралейны
+     * @param otherLine
+     * @return {Number}
+     */
+    Line2d.prototype.getParallelismCoefficient = function (otherLine) {
+        return this.a * otherLine.b - this.b * otherLine.a;
+    };
+    /**
+     * @function определяет параллейны ли линии
+     * @return {Boolean}
+     * @param otherLine
+     */
+    Line2d.prototype.isParallel = function (otherLine) {
+        var error = 0.001;
+        return Math.abs(this.getParallelismCoefficient(otherLine)) < error;
+    };
+    /**
      * @function проверяет лежит ли точка на прямой
      * @param point {Point2d}
      * @return {Boolean}
      */
     Line2d.prototype.onLine = function (point) {
-        var error = this.a * point.x + this.b * point.y + this.c;
+        var error = this.apply(point);
         return Math.abs(error) < 0.001;
     };
     /**
@@ -101,13 +125,13 @@
      * @return {Point2d|null}
      */
     Line2d.prototype.getCross = function (otherLine) {
-        var x, y, assertParallel;
-        assertParallel = this.a * otherLine.b - this.b * otherLine.a;
-        if (Math.abs(assertParallel) < 0.001) {
+        var x, y, coefficientParallel;
+        coefficientParallel = this.getParallelismCoefficient(otherLine);
+        if (this.isParallel(otherLine)) {
             return null;
         }
-        x = -(this.c * otherLine.b - otherLine.c * this.b) / assertParallel;
-        y = -(this.a * otherLine.c - otherLine.a * this.c) / assertParallel;
+        x = -(this.c * otherLine.b - otherLine.c * this.b) / coefficientParallel;
+        y = -(this.a * otherLine.c - otherLine.a * this.c) / coefficientParallel;
         return new Point2d({
             "x": x,
             "y": y
@@ -125,9 +149,7 @@
      * @return {Number}
      */
     Line2d.prototype.getDistanceTo = function (point) {
-        return Math.abs((this.a * point.x + this.b * point.y + this.c)
-            /
-            (Math.sqrt(this.a * this.a + this.b * this.b)));
+        return Math.abs(this.apply(point) / this.getVector().getVectorLength());
     };
     /**
      * @function находит перпендикулярную линию
@@ -160,13 +182,22 @@
         });
     };
     /**
+     * @function Дать точку находящуюся на расстояни onDistance от точки from лежащей на прямой
+     * @param from {Point2d} От какой точки
+     * @param onDistance {Number} на расстоянии
+     * @return {Point2d}
+     */
+    Line2d.prototype.getPoint = function (from, onDistance) {
+        var normalizeVector = this.getVector().getNormalizedVector();
+        return from.addWith(normalizeVector.multiply(onDistance));
+    };
+    /**
      * @function Находит под каким углом идет прямая относительно экранных координат
      * @return {Number}
      */
     Line2d.prototype.getAbsAngle = function () {
         var toZero = this.finish.subtractWith(this.start);
         return 360 * (Math.atan2(toZero.y, toZero.x) - Math.PI / 2) / (2 * Math.PI);
-
     };
 
 }(window));

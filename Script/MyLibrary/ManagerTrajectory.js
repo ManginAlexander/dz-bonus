@@ -24,20 +24,14 @@
      * @return {PlayerState}
      */
     ManagerTrajectory.prototype.getFutureState = function (previousState) {
-        if (previousState.speed.distanceTo(Point2d.Zero) < 1) {
+        if (previousState.isStay()) {
             return previousState;
         }
         var moveLine = new Line2d({
-            "start": new Point2d({
-                "x": previousState.location.x,
-                "y": previousState.location.y
+                "start": previousState.location.copy(),
+                "finish": previousState.getNextLocation()
             }),
-            "finish": new Point2d({
-                "x": previousState.location.x + previousState.speed.x,
-                "y": previousState.location.y + previousState.speed.y
-            })
-        }),
-            nearestCross = this.getRealCrossWith(moveLine),
+            nearestCross = getNearestCross(previousState.location, this.getAllCrossWithWalls(moveLine)),
             newState,
             mirrorLine,
             speedNonNormalize,
@@ -45,7 +39,6 @@
             valueSpeed;
         if (nearestCross.length === 0) {
             console.log("Чтото пошло явно не так");
-            this.getRealCrossWith(moveLine)
             throw new Error();
         }
         newState = new PlayerState({
@@ -59,72 +52,83 @@
                 "x": mirrorLine.dx(),
                 "y": mirrorLine.dy()
             });
-            valueSpeedNonNormalize = speedNonNormalize.distanceTo(Point2d.Zero);
-            valueSpeed = previousState.speed.distanceTo(Point2d.Zero);
+            valueSpeedNonNormalize = speedNonNormalize.getDistanceTo(Point2d.Zero);
+            valueSpeed = previousState.speed.getDistanceTo(Point2d.Zero);
             speedNonNormalize.x = (speedNonNormalize.x / valueSpeedNonNormalize) * valueSpeed;
             speedNonNormalize.y = (speedNonNormalize.y / valueSpeedNonNormalize) * valueSpeed;
             newState.speed = speedNonNormalize;
         }
         return newState;
     };
-    /**
-     * Найти реальное место столкновения с учетом размера стенок и размера шара
-     * @field crossLine {Line2d}
-     * @return {Object}
-     */
-    ManagerTrajectory.prototype.getRealCrossWith = function (crossLine) {
-        var nearestCross = [],
-            minimalDistanceForCross = Number.POSITIVE_INFINITY,
-            that = this,
-            distance,
-            distanceBetweenStartOfCrossLineAndLine,
-            k,
-            additionalPoint,
-            realCross,
-            projectionRealCross,
-            angle;
-        this.lines.forEach(function (line) {
-            var cross = crossLine.getCross(line);
-            if (cross === null) {
+    ManagerTrajectory.prototype.getCrossLineAndMovingCircle = function (line, movementLine) {
+    };
+    var existsCrossBetweenBeamWithSegment = function (beam, line) {
+        var cross = beam.getCross(line),
+            vectorCross;
+        if (cross === null) {
+            return false;
+        }
+        vectorCross = cross.subtractWith(beam.start);
+        return vectorCross.isCollinear(beam.getVector());
+    };
+    var isCircleOnLine = function (center, radius, line) {
+        return line.getDistanceTo(center) < radius;
+    };
+    var isCircleTangentOnLine = function (center, line) {
+        var projectionCenterOnLine = line.getNormalLine(center).getCross(line);
+        return projectionCenterOnLine.between2Point(line.start, line.finish);
+    };
+    var getCrossCircleCrossAndLinesAngle = function (center, radius, movementLine, line) {
+        var angle = movementLine.getDistanceTo(line.start) < movementLine.getDistanceTo(line.finish)
+            ? line.start : line.finish,
+            distanceBetweenAngleAndPrevLocCircle;
+        if (movementLine.getDistanceTo(angle) > radius) {
+            return null;
+        }
+        distanceBetweenAngleAndPrevLocCircle = center.getDistanceTo(angle);
+        return movementLine.getPoint(center, distanceBetweenAngleAndPrevLocCircle - radius);
+    };
+    var getNearestCross = function (currentLoc, linesAndCrosses) {
+        var nearestCrosses = [],
+            minDistance = Number.MAX_VALUE;
+        linesAndCrosses.forEach(function (lineAndCross) {
+            var distance = lineAndCross.cross.getDistanceTo(currentLoc);
+            if (distance > minDistance) {
                 return;
             }
-            if (cross.subtractWith(crossLine.start).isCollinear(crossLine.getVector())) {
-                distanceBetweenStartOfCrossLineAndLine = line.getDistanceTo(crossLine.start);
-                if (distanceBetweenStartOfCrossLineAndLine < that.radiusOfCircle) {
-                    return;
-                }
-                k =  distanceBetweenStartOfCrossLineAndLine / that.radiusOfCircle;
-
-                realCross = new Point2d({
-                    "x": crossLine.start.x + (cross.x - crossLine.start.x) * ((k - 1) / k),
-                    "y": crossLine.start.y + (cross.y - crossLine.start.y) * ((k - 1) / k)
-                });
-                projectionRealCross = line.getNormalLine(realCross).getCross(line);
-                if (!projectionRealCross.between2Point(line.start, line.finish)) {
-                    //возможно мы врезались в угол
-                    angle = crossLine.getDistanceTo(line.start) < crossLine.getDistanceTo(line.finish)
-                        ? line.start : line.finish;
-                    if (crossLine.getDistanceTo(angle) > that.radiusOfCircle) {
-                        return; //нет мы не врезались в угол
-                    }
-                    additionalPoint = crossLine.getNormalLine(angle).getCross(crossLine);
-                    k = additionalPoint.distanceTo(crossLine.start) - Math.sqrt(that.radiusOfCircle * that.radiusOfCircle - additionalPoint.distanceTo(angle) * additionalPoint.distanceTo(angle));
-
-                    realCross = crossLine.getVector().getNormalizedVector().multiply(k).addWith(crossLine.start);
-                }
-                distance = crossLine.start.distanceTo(realCross);
-                if (minimalDistanceForCross >= distance) {
-                    if (minimalDistanceForCross !== distance) {
-                        nearestCross = [];
-                        minimalDistanceForCross = distance;
-                    }
-                    nearestCross.push({
-                        "line": line,
-                        "cross": realCross
-                    });
-                }
+            if (distance === minDistance) {
+                nearestCrosses.push(lineAndCross);
+            } else {
+                nearestCrosses = [lineAndCross];
+                minDistance = distance;
             }
         });
-        return nearestCross;
+        return nearestCrosses;
+    };
+    /**
+     * Найти все возможные столкновения фишки при учете что есть только одна стенка.
+     * @param movementLine {Line2d}
+     * @return {Array}
+     */
+    ManagerTrajectory.prototype.getAllCrossWithWalls = function (movementLine) {
+        var that = this;
+        return this.lines.map(function (line) {
+            if (!existsCrossBetweenBeamWithSegment(movementLine, line) ||  isCircleOnLine(movementLine.start, that.radiusOfCircle, line)) {
+                return null;
+            }
+            var distanceBetweenPreviousLocAndLinesCross = movementLine.getCross(line).getDistanceTo(movementLine.start),
+                distanceBetweenPreviousLocCircleAndLine = line.getDistanceTo(movementLine.start),
+                realCross = movementLine.getPoint(movementLine.start, distanceBetweenPreviousLocAndLinesCross * (1 - that.radiusOfCircle / distanceBetweenPreviousLocCircleAndLine));
+            if (!isCircleTangentOnLine(realCross, line)) {
+                //возможно мы врезались в угол
+                realCross = getCrossCircleCrossAndLinesAngle(realCross, that.radiusOfCircle, movementLine, line);
+            }
+            return {
+                "cross": realCross,
+                "line": line
+            };
+        }).filter(function (el) {
+            return el !== null  && el.cross !== null;
+        });
     };
 }(window));

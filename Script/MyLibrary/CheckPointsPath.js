@@ -70,7 +70,7 @@
         var left,
             right,
             middle = start.addWith(end).multiply(1 / 2);
-        if (start.distanceTo(end) <= 2 * this.distanceBetweenCheckPoint) {
+        if (start.getDistanceTo(end) <= 2 * this.distanceBetweenCheckPoint) {
             return [middle];
         }
         left = this.getsDiff(start, middle);

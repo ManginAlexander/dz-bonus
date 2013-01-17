@@ -107,7 +107,7 @@
                     "finish": that.last
                 }),
                 projectionCenterCircle = line.getNormalLine(that.state.location).getCross(line);
-            if (projectionCenterCircle !== null && projectionCenterCircle.between2Point(currentMouseLocation, that.last) &&  projectionCenterCircle.distanceTo(that.state.location) <= that.circle.radius) {
+            if (projectionCenterCircle !== null && projectionCenterCircle.between2Point(currentMouseLocation, that.last) &&  projectionCenterCircle.getDistanceTo(that.state.location) <= that.circle.radius) {
 
                 that.changeMoveVector(new Point2d({
                     "x": currentMouseLocation.x - that.last.x,
@@ -144,7 +144,7 @@
                     normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();
                     pointOnCircle = that.state.location.addWith(normVector.multiply(k));
                     that.checkPointsContainer.clear();
-                    if (pointOnCircle.distanceTo(nextState.location) >= that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint) {
+                    if (pointOnCircle.getDistanceTo(nextState.location) >= that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint) {
                         that.checkPointsContainer.adds(pointOnCircle, nextState.location);
                     }
                 }
