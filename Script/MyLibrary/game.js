@@ -84,7 +84,6 @@
      * @function запускает игру
      */
     Game.prototype.start = function () {
-        console.debug();
         var that = this,
             arrow = null;
 
@@ -133,7 +132,7 @@
         }
         setTimeout(function animate() {
             if (!that.isChangeMoveVector) {
-                if (that.state.speed.equal(Point2d.Zero)) {
+                if (that.state.isStay()) {
                     setTimeout(animate, frequencyUpdate);
                     return;
                 }

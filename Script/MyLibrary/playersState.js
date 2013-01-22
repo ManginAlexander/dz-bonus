@@ -1,5 +1,6 @@
 ﻿/*global
-Point2d: false
+Point2d: false,
+Line2d: false
  */
 (function (toExport) {
     "use strict";
@@ -73,6 +74,7 @@ Point2d: false
     PlayerState.prototype.getNextLocation = function () {
         return this.location.addWith(this.speed);
     };
+
     PlayerState.prototype.toString = function () {
         return "Loc:" + this.location + ";Speed:" + this.speed;
     };
