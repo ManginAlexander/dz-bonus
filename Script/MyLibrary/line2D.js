@@ -144,6 +144,15 @@
         });
     };
     /**
+     * @function дать проекцию точки на прямую
+     * @param point {Point2d}
+     * @return {Point2d}
+     */
+    Line2d.prototype.getProjection = function (point) {
+        var perpendicularLine = this.getNormalLine(point);
+        return this.getCross(perpendicularLine);
+    };
+    /**
      * @function находит расстояние между точкой и прямой
      * @param point {Point2d}
      * @return {Number}
