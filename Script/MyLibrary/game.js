@@ -161,6 +161,9 @@
      * @param newSpeed {Point2d} новый вектор скорости
      */
     Game.prototype.changeMoveVector = function (newSpeed) {
+        if (newSpeed > 20) {
+            newSpeed = newSpeed.getNormalizedVector().multiply(20);
+        }
         this.state.speed = newSpeed;
         this.queueMove = [];
         this.checkPointsContainer.clear();

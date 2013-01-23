@@ -13,7 +13,7 @@
         this.checkPoints = [];
         toExport.Model.call(this, container);
         this.distanceBetweenCheckPoint = this.radius * 4;
-        this.minDistanceForPath = 2 * this.radius + this.distanceBetweenCheckPoint;
+        this.minDistanceForPath = 4 * this.radius + this.distanceBetweenCheckPoint;
     };
 
     CheckPointContainer.prototype = Object.create(toExport.Model.prototype, {
