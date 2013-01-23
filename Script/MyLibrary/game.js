@@ -166,6 +166,14 @@
         this.checkPointsContainer.clear();
     };
     /**
+     * @function Остановить фишку
+     */
+    Game.prototype.stay = function () {
+        this.state.speed = new Point2d({"x": 0, "y": 0});
+        this.queueMove = [];
+        this.checkPointsContainer.clear();
+    };
+    /**
      * @function Остановить игру
      */
     Game.prototype.stop = function () {
