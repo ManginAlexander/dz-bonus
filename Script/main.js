@@ -54,6 +54,19 @@
             if (currentGame) {
                 currentGame.stop();
             }
+            var averagePoint = new Point2d({"x": 0, "y": 0});
+            points.forEach(function (point) {
+                averagePoint = averagePoint.addWith(point);
+            });
+            averagePoint = averagePoint.multiply(1 / points.length);
+            canvas.add(new fabric.Text("Push ME!!!", {
+                strokeStyle: '#ff1318',
+                "top": averagePoint.y + 100,
+                "left": averagePoint.x,
+                "fill": "white",
+                strokeWidth: 2
+            }));
+
             currentGame = new Game({
                 "lines": lines,
                 "state": state,
