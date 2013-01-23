@@ -4336,7 +4336,7 @@ Expr = Sizzle.selectors = {
 						node = elem;
 
 						/* falls through */
-					case "last":
+					case "previousMouseLocation":
 						while ( (node = node.nextSibling) ) {
 							if ( node.nodeType === 1 ) {
 								return false;

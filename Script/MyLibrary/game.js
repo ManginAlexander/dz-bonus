@@ -36,25 +36,11 @@
             "lockMovementX": true,
             "lockMovementY": true
         }));
-
-        this.circle = new fabric.Circle({
-            "left": this.state.location.x,
-            "top": this.state.location.y,
+        this.circle = new fabric.Chip({
+            "x": this.state.location.x,
+            "y": this.state.location.y,
             "radius": this.radius
         });
-        this.circle.setGradientFill({
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: this.circle.height,
-            colorStops: {
-                0: '#a6cbfb',
-                1: '#5495d3'
-            }
-        });
-        this.circle.set({ strokeWidth: 1, stroke: 'rgba(33,127,213,1)' });
-        this.circle.hasBorders = this.circle.hasControls = false;
-        this.circle.lockMovementX = this.circle.lockMovementY = true;
         this.canvas.add(this.circle);
 
         this.manager = new ManagerTrajectory({
@@ -68,7 +54,7 @@
         });
         this.isChangeMoveVector = false;
         this.isAnimate = true;
-        this.last = new Point2d({"x": 0, "y": 0});
+        this.previousMouseLocation = null;
     };
 
     Game.prototype = Object.create(toExport.Model.prototype, {
@@ -84,36 +70,28 @@
      * @function запускает игру
      */
     Game.prototype.start = function () {
-        var that = this,
-            arrow = null;
-
-        this.canvas.on('mouse:down', function (e) {
-            if (e.target === that.circle) {
-                that.isChangeMoveVector = true;
-            }
-        });
-        this.canvas.on('mouse:up', function () {
-            that.isChangeMoveVector = false;
-            if (arrow) {
-                that.canvas.remove(arrow);
-                arrow = null;
-            }
-        });
+        var that = this;
         this.canvas.on('mouse:move', function (e) {
-            var currentMouseLocation = new Point2d({"x": e.e.offsetX, "y": e.e.offsetY}),
-                line = new Line2d({
-                    "start": currentMouseLocation,
-                    "finish": that.last
-                }),
-                projectionCenterCircle = line.getNormalLine(that.state.location).getCross(line);
-            if (projectionCenterCircle !== null && projectionCenterCircle.between2Point(currentMouseLocation, that.last) &&  projectionCenterCircle.getDistanceTo(that.state.location) <= that.circle.radius) {
-
-                that.changeMoveVector(new Point2d({
-                    "x": currentMouseLocation.x - that.last.x,
-                    "y": currentMouseLocation.y - that.last.y
-                }));
+            var currentMouseLocation = new Point2d({
+                "x": e.e.offsetX,
+                "y": e.e.offsetY
+            }),
+                mouseLine,
+                projectionCenterCircle;
+            if (that.previousMouseLocation === null) {
+                that.previousMouseLocation = currentMouseLocation;
+                return;
             }
-            that.last = currentMouseLocation;
+            mouseLine = new Line2d({
+                "start": currentMouseLocation,
+                "finish": that.previousMouseLocation
+            });
+            projectionCenterCircle = mouseLine.getNormalLine(that.state.location).getCross(mouseLine);
+            if (projectionCenterCircle !== null && projectionCenterCircle.between2Point(currentMouseLocation, that.previousMouseLocation) &&
+                    projectionCenterCircle.getDistanceTo(that.state.location) <= that.circle.radius) {
+                that.changeMoveVector(currentMouseLocation.subtractWith(that.previousMouseLocation));
+            }
+            that.previousMouseLocation = currentMouseLocation;
         });
         this.animateAll();
     };
@@ -123,13 +101,25 @@
     Game.prototype.animateAll  = function () {
         var that = this,
             frequencyUpdate = 100,
-            nextState,
-            pointOnCircle,
-            k,
-            normVector;
+            nextState;
         if (!this.isAnimate) {
             return;
         }
+        setTimeout(function animate() {
+            if (that.state.isStay()) {
+                that.circle.animate('radius', 0.7 * that.radius, {
+                    onChange: that.canvas.renderAll.bind(that.canvas),
+                    onComplete: function () {
+                        that.circle.animate('radius', that.radius, {
+                            onChange: that.canvas.renderAll.bind(that.canvas),
+                            duration: 4 * frequencyUpdate
+                        });
+                    },
+                    duration: 4 * frequencyUpdate
+                });
+            }
+            setTimeout(animate, 10 * frequencyUpdate);
+        }, 10 * frequencyUpdate);
         setTimeout(function animate() {
             if (!that.isChangeMoveVector) {
                 if (that.state.isStay()) {
@@ -139,18 +129,14 @@
                 if (that.queueMove.length === 0) {
                     nextState = that.manager.getFutureState(that.state);
                     that.queueMove = that.state.getDiffs(nextState);
-                    k = that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint;
-                    normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();
-                    pointOnCircle = that.state.location.addWith(normVector.multiply(k));
+
                     that.checkPointsContainer.clear();
-                    if (pointOnCircle.getDistanceTo(nextState.location) >= that.circle.radius + that.checkPointsContainer.distanceBetweenCheckPoint) {
-                        that.checkPointsContainer.adds(pointOnCircle, nextState.location);
+                    if (that.state.location.getDistanceTo(nextState.location) >= that.checkPointsContainer.minDistanceForPath) {
+                        that.checkPointsContainer.adds(that.state.location, nextState.location);
                     }
                 }
                 that.state.location = that.queueMove.shift();
-                normVector = nextState.location.subtractWith(that.state.location).getNormalizedVector();
-                pointOnCircle = that.state.location.addWith(normVector.multiply(k));
-                that.checkPointsContainer.removeLessOrEqualThan(pointOnCircle);
+                that.checkPointsContainer.removePreviousCheckPoint(that.state.location);
                 that.circle.animate('left', that.state.location.x, {
                     onChange: that.canvas.renderAll.bind(that.canvas),
                     duration: frequencyUpdate
@@ -161,6 +147,7 @@
                     });
                 if (that.queueMove.length === 0) {
                     that.state.speed = nextState.speed;
+
                 }
             }
 

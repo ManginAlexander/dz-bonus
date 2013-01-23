@@ -46,10 +46,10 @@
             distanceBetweenLineAndPoint = projectionPoint.getDistanceTo(point),
             distanceBetweenCenterCircleAndPrPoint = this.center.getDistanceTo(projectionPoint);
         //Пересечения нет, если шарик летит не в ту сторону или летит далеко
-        if (!needVector.isCollinear(movingLine.getVector()) || distanceBetweenLineAndPoint > this.radius) {
+        if (distanceBetweenLineAndPoint > this.radius) {
             return null;
         }
-        return movingLine.getPoint(this.center, distanceBetweenCenterCircleAndPrPoint - this.radius * this.radius + distanceBetweenLineAndPoint * distanceBetweenLineAndPoint);
+        return movingLine.getPoint(this.center, distanceBetweenCenterCircleAndPrPoint - Math.sqrt(this.radius * this.radius - distanceBetweenLineAndPoint * distanceBetweenLineAndPoint));
     };
     /**
      * @function найти пересечение с углом отрезка (Окружность не пересекает отрезок)

@@ -56,7 +56,7 @@
      * @return {PlayerState}
      */
     ManagerTrajectory.prototype.getFutureState = function (previousState) {
-
+        console.log(previousState.toString());
         if (previousState.isStay()) {
             return previousState;
         }
@@ -112,7 +112,7 @@
                 });
             if (!newCircle.onSegment(line)) {
                 //возможно мы врезались в угол
-                newCircle.center = newCircle.getCrossWithSegmentsAngles(movementLine, line);
+                newCircle.center = movingCircle.getCrossWithSegmentsAngles(movementLine, line);
             }
             return {
                 "cross": newCircle.center,

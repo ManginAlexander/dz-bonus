@@ -13,6 +13,7 @@
         this.checkPoints = [];
         toExport.Model.call(this, container);
         this.distanceBetweenCheckPoint = this.radius * 4;
+        this.minDistanceForPath = 2 * this.radius + this.distanceBetweenCheckPoint;
     };
 
     CheckPointContainer.prototype = Object.create(toExport.Model.prototype, {
@@ -80,10 +81,10 @@
 
     /**
      * @function удалить пройденные check point
-     * @param point {Point2d} положение объекта
+     * @param currentLoc {Point2d} положение объекта
      */
-    CheckPointContainer.prototype.removeLessOrEqualThan = function (point) {
-        while (this.checkPoints.length !== 0 && this.checkPoints[0].between2Point(this.start, point)) {
+    CheckPointContainer.prototype.removePreviousCheckPoint = function (currentLoc) {
+        while (this.checkPoints.length !== 0 && this.checkPoints[0].getDistanceTo(currentLoc) < this.minDistanceForPath) {
             var graphicCheckPoint = this.graphicCheckPoints.shift();
             this.checkPoints.shift();
             graphicCheckPoint.canvas.remove(graphicCheckPoint);
