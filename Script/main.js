@@ -20,7 +20,7 @@
     $("<canvas />", {
         "id": "c"
     })
-        .attr("width", document.body.offsetWidth / 2)
+        .attr("width", document.body.offsetWidth)
         .attr("height", window.innerHeight)
         .attr("style", "border:1px solid #ccc")
         .appendTo(document.body);
